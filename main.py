@@ -2,6 +2,7 @@
 
 import signal
 import json
+import time
 import sys
 import os
 
@@ -57,7 +58,9 @@ def main(config_file: str = "config.json") -> None:
     config = setup(config_file)
     bot_token = config["discord"]["bot_token"]
     greeting_channel_id = config["greeting_channel_id"]
-    logger.debug("Retrieved Discord API tokens from config file")
+    member_role_id = config["member_role_id"]
+    sleep_time = config["sleep_time"]
+    logger.debug("Retrieved neccessary data from config file")
 
     intents = nextcord.Intents.default()
     intents.members = True
@@ -70,8 +73,17 @@ def main(config_file: str = "config.json") -> None:
         logger.debug("Got on_member_join event, member.guild=<m>{}</>",
                      member.guild)
 
+        # sleep so that welcome message doesn't come before join ack
+        logger.trace("Waiting <m>{}</>s...", sleep_time)
+        time.sleep(sleep_time)
+
+        logger.debug("Sending welcome message to <m>{}</>", member)
         channel = client.get_channel(greeting_channel_id)
-        await channel.send(TEMPLATES["welcome"].format(member))
+        await channel.send(TEMPLATES["welcome"].format(member.mention))
+
+        logger.debug("Adding member role to <m>{}</>", member)
+        member_role = member.guild.get_role(member_role_id)
+        await member.add_roles(member_role)
 
     client.run(bot_token)
     logger.error("Disconnected, stopping the script")
