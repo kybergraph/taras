@@ -1,0 +1,6 @@
+{
+  "logs_path": "logs/",
+  "discord": {
+    "bot_token": "..."
+  }
+}
