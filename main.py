@@ -56,15 +56,24 @@ def main(config_file: str = "config.json") -> None:
 
     config = setup(config_file)
     bot_token = config["discord"]["bot_token"]
+    greeting_channel_id = config["greeting_channel_id"]
     logger.debug("Retrieved Discord API tokens from config file")
 
-    bot = commands.Bot()
+    intents = nextcord.Intents.default()
+    intents.members = True
+    client = commands.Bot(intents=intents)
 
-    @bot.slash_command(description="Replies with pong!")
-    async def ping(interaction: nextcord.Interaction):
-        await interaction.send("Pong!", ephemeral=True)
+    @client.event
+    async def on_member_join(member):
+        """Respong to ping command"""
+        # sender_name = member.nick
+        logger.debug("Got on_member_join event, member.guild=<m>{}</>",
+                     member.guild)
 
-    bot.run(bot_token)
+        channel = client.get_channel(greeting_channel_id)
+        await channel.send(TEMPLATES["welcome"].format(member))
+
+    client.run(bot_token)
     logger.error("Disconnected, stopping the script")
 
 
