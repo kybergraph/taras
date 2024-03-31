@@ -1,8 +1,5 @@
 {
   "logs_path": "logs/",
-  "discord": {
-    "bot_token": "..."
-  },
   "greeting_channel_id": 1234567890,
   "member_role_id": 1234567890,
   "sleep_time": 2.5

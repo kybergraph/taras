@@ -1,5 +1,6 @@
 """Implementation for @osintbuddybot (Discord)"""
 
+import dotenv
 import signal
 import json
 import time
@@ -21,9 +22,24 @@ def sigint_handler(sig, frame):
     sys.exit(0)
 
 
-def setup(config_path: str) -> None:
+def get_discord_token() -> str:
+    """Get the bot token from the environment"""
+    logger.debug("Retrieving bot token from environment")
+
+    token = os.getenv('DISCORD_TOKEN')
+    if token is None:
+        logger.error(
+            "No token found in environment, exiting... (DISCORD_TOKEN var)")
+        sys.exit(1)
+
+    return token
+
+
+def setup(config_path: str) -> dict:
     """Setup logging, get config, etc"""
     global logger, db_con, db_cur
+
+    dotenv.load_dotenv()
 
     logger.remove(0)
     logger = logger.opt(colors=True)
@@ -56,7 +72,7 @@ def main(config_file: str = "config.json") -> None:
     logger.info("Starting the bot... (config_file=<m>{}</>)", config_file)
 
     config = setup(config_file)
-    bot_token = config["discord"]["bot_token"]
+    bot_token = get_discord_token()
     greeting_channel_id = config["greeting_channel_id"]
     member_role_id = config["member_role_id"]
     sleep_time = config["sleep_time"]
