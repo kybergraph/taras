@@ -84,7 +84,7 @@ def main(config_file: str = "config.json") -> None:
 
     @client.event
     async def on_member_join(member):
-        """Respong to ping command"""
+        """Respong to member join event"""
         # sender_name = member.nick
         logger.debug("Got on_member_join event, member.guild=<m>{}</>",
                      member.guild)
